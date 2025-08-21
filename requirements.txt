@@ -2,5 +2,7 @@ Flask
 scikit-learn
 pandas
 numpy
-waitress
+joblib
+gunicorn
+
 
