@@ -1,4 +1,5 @@
 import os
+from waitress import serve # type: ignore
 from flask import Flask, render_template, request
 from datetime import datetime
 
@@ -115,6 +116,8 @@ def index():
         summary = {'Green':0,'Yellow':0,'Orange':0,'Red':0}
         return render_template('index.html', history=history, summary=summary, locations=locations)
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
 
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    serve(app, host="0.0.0.0", port=port)
