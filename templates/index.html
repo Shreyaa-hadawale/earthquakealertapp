@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "base.html" %}
 
 {% block content %}
@@ -104,3 +105,130 @@
   }
 </script>
 {% endblock %}
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Earthquake Alert Prediction</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<style>
+body { font-family: 'Roboto', sans-serif; background-color: #f5f5f5; }
+#map { height: 700px; margin-bottom: 20px; }
+.card { margin-bottom: 15px; }
+</style>
+</head>
+<body>
+<div class="container mt-4">
+
+<!-- Input Form & Map -->
+<div class="row">
+  <div class="col-md-6">
+    <form method="POST" action="{{ url_for('index') }}">
+
+      <div class="card p-3">
+        <h5>Earthquake Input</h5>
+
+        <!-- Main Inputs -->
+        <div class="mb-2">
+          <label>Magnitude</label>
+          <input type="number" step="0.1" class="form-control" name="magnitude" required>
+        </div>
+        <div class="mb-2">
+          <label>Depth (km)</label>
+          <input type="number" step="0.1" class="form-control" name="depth" required>
+        </div>
+        <div class="mb-2">
+          <label>Latitude</label>
+          <input type="number" step="0.0001" class="form-control" name="latitude" required>
+        </div>
+        <div class="mb-2">
+          <label>Longitude</label>
+          <input type="number" step="0.0001" class="form-control" name="longitude" required>
+        </div>
+        <div class="mb-2">
+          <label>Location</label>
+          <select class="form-select" name="loc_enc">
+            {% for loc in locations %}
+            <option value="{{ loc }}">{{ loc }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Collapsible Advanced Inputs -->
+        <button class="btn btn-info mt-2 mb-2 w-100" type="button" data-bs-toggle="collapse" data-bs-target="#advancedInputs">
+          Show/Hide Advanced Inputs
+        </button>
+        <div id="advancedInputs" class="collapse">
+          <div class="mb-2">
+            <label>NST</label>
+            <input type="number" class="form-control" name="nst" value="10">
+          </div>
+          <div class="mb-2">
+            <label>GAP</label>
+            <input type="number" class="form-control" name="gap" value="120">
+          </div>
+          <div class="mb-2">
+            <label>Dmin</label>
+            <input type="number" step="0.01" class="form-control" name="dmin" value="0.1">
+          </div>
+          <div class="mb-2">
+            <label>RMS</label>
+            <input type="number" step="0.1" class="form-control" name="rms" value="1.0">
+          </div>
+          <div class="mb-2">
+            <label>Mag Error</label>
+            <input type="number" step="0.01" class="form-control" name="magError" value="0.2">
+          </div>
+          <div class="mb-2">
+            <label>Depth Error</label>
+            <input type="number" step="0.1" class="form-control" name="depthError" value="5">
+          </div>
+          <div class="mb-2">
+            <label>Mag NST</label>
+            <input type="number" class="form-control" name="magNst" value="5">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mt-2">Predict Alert</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="col-md-6">
+    <div id="map"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+var map = L.map('map').setView([20,78],5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ maxZoom:18 }).addTo(map);
+
+// Marker for user click
+var marker = null;
+
+// Click map to set lat/lon and marker
+map.on('click', function(e){
+    var lat = e.latlng.lat.toFixed(4);
+    var lon = e.latlng.lng.toFixed(4);
+    document.querySelector('input[name="latitude"]').value = lat;
+    document.querySelector('input[name="longitude"]').value = lon;
+
+    if(marker){ marker.setLatLng(e.latlng); }
+    else{ marker = L.marker(e.latlng).addTo(map); }
+});
+</script>
+</body>
+</html>
+
+
+
+
+
+
+>>>>>>> 267b126dc953be5ed1c4aaa5d1097ec59cd97069
