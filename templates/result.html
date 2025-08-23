@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="color:white; padding:20px;">
+
+    <!-- Alert Result -->
+    <div style="text-align:center; margin-bottom:30px;">
+        <h1>Predicted Alert: 
+            <span style="
+                color:{% if alert=='Red' %}#FF4C4C{% elif alert=='Orange' %}#FF9900{% elif alert=='Yellow' %}#FFFF66{% else %}#66FF66{% endif %};
+                font-weight:bold;
+            ">
+            {{ alert }}
+            </span>
+        </h1>
+    </div>
+
+    <!-- Probability Bars -->
+    <div style="margin-bottom:30px;">
+        {% for key, value in prob.items() %}
+        <div style="margin:5px 0;">
+            <span>{{ key }}</span>
+            <div style="background:#555; border-radius:5px; overflow:hidden; display:inline-block; width:70%;">
+                <div style="width:{{ value*100 }}%; background:{% if key=='Red' %}#FF4C4C{% elif key=='Orange' %}#FF9900{% elif key=='Yellow' %}#FFFF66{% else %}#66FF66{% endif %}; height:20px;"></div>
+            </div>
+            <span>{{ (value*100)|round(1) }}%</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Map -->
+    <div id="map" style="height:400px; margin-bottom:30px;"></div>
+
+    <!-- Recent Alerts Trend -->
+    <div style="margin-bottom:30px;">
+        <h3>Recent Alert Trends</h3>
+        <canvas id="trendChart" style="background:#222; border-radius:10px; padding:10px;"></canvas>
+    </div>
+</div>
+
+<!-- Leaflet JS for Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    var map = L.map('map').setView([{{ latitude }}, {{ longitude }}], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Marker for predicted alert
+    L.circle([{{ latitude }}, {{ longitude }}], {
+        color: '{{ alert|lower }}'=='red' ? '#FF4C4C' : '{{ alert|lower }}'=='orange' ? '#FF9900' : '{{ alert|lower }}'=='yellow' ? '#FFFF66' : '#66FF66',
+        fillColor: '{{ alert|lower }}'=='red' ? '#FF4C4C' : '{{ alert|lower }}'=='orange' ? '#FF9900' : '{{ alert|lower }}'=='yellow' ? '#FFFF66' : '#66FF66',
+        fillOpacity: 0.5,
+        radius: 50000
+    }).addTo(map);
+</script>
+
+<!-- Chart.js for trend -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('trendChart').getContext('2d');
+    var labels = [
+        {% for h in history %}'{{ h.timestamp }}',{% endfor %}
+    ];
+    var data = [
+        {% for h in history %}
+            {% if h.alert=='Red' %}3
+            {% elif h.alert=='Orange' %}2
+            {% elif h.alert=='Yellow' %}1
+            {% else %}0{% endif %},{% endfor %}
+    ];
+    var trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Alert Trend',
+                data: data,
+                borderColor: 'cyan',
+                backgroundColor: 'rgba(0,255,255,0.2)',
+                fill:true,
+                tension:0.3
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    ticks: { stepSize: 1, color:'white' },
+                    min:0,
+                    max:3,
+                    title: { display:true, text:'Alert Level', color:'white' }
+                },
+                x: { ticks: { color:'white' } }
+            },
+            plugins: { legend: { labels: { color:'white' } } }
+        }
+    });
+</script>
+{% endblock %}
+
+
+
+
+
+

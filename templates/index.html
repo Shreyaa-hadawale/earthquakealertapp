@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center text-light mb-4">Earthquake Alert Prediction</h2>
+    <form method="POST" action="{{ url_for('predict') }}">
+        <div class="row g-4">
+            <!-- Left Column Card -->
+            <div class="col-md-6">
+                <div class="card bg-dark text-light shadow-sm p-3 h-100">
+                    <h5 class="card-title mb-3">Seismic Parameters</h5>
+                    <div class="mb-3">
+                        <input type="number" step="0.1" class="form-control" name="mag" placeholder="Magnitude (e.g., 5.6)" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="number" step="0.1" class="form-control" name="depth" placeholder="Depth km (e.g., 12.5)" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="number" class="form-control" name="nst" placeholder="NST (e.g., 15)" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="number" step="0.1" class="form-control" name="gap" placeholder="GAP (e.g., 120)" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="number" step="0.01" class="form-control" name="dmin" placeholder="Dmin (e.g., 0.05)" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="number" step="0.01" class="form-control" name="rms" placeholder="RMS (e.g., 0.8)" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column Card -->
+            <div class="col-md-6">
+                <div class="card bg-dark text-light shadow-sm p-3 h-100">
+                    <h5 class="card-title mb-3">Additional Parameters</h5>
+                    <div class="mb-3">
+                        <input type="number" step="0.01" class="form-control" name="magError" placeholder="Magnitude Error (e.g., 0.2)" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="number" step="0.1" class="form-control" name="depthError" placeholder="Depth Error (e.g., 5)" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="number" class="form-control" name="magNst" placeholder="Mag NST (e.g., 7)" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="number" step="0.01" class="form-control" name="field12" placeholder="Additional Field" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="number" step="0.01" class="form-control" id="latitude" name="latitude" placeholder="Latitude (click map)" readonly required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="number" step="0.01" class="form-control" id="longitude" name="longitude" placeholder="Longitude (click map)" readonly required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <div class="card bg-dark text-light shadow-sm mt-4 p-3">
+            <h5 class="mb-2">Select Location on Map</h5>
+            <div id="map" style="height: 400px; border-radius: 10px;"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg mt-4 w-100">Predict Alert</button>
+    </form>
+</div>
+
+<!-- Leaflet JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    var map = L.map('map').setView([20, 78], 4); // Center of India/world view
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    var marker;
+
+    map.on('click', function(e) {
+        var lat = e.latlng.lat.toFixed(4);
+        var lng = e.latlng.lng.toFixed(4);
+
+        if(marker){
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng).addTo(map);
+        }
+
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
+    });
+</script>
+
+<!-- ✅ PWA Manifest + Service Worker -->
+<link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#1976d2">
+
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/static/sw.js")
+      .then((reg) => console.log("Service Worker registered:", reg))
+      .catch((err) => console.log("SW registration failed:", err));
+  }
+</script>
+{% endblock %}

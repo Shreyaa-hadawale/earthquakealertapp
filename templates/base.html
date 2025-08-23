@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Earthquake Alert Prediction{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#007bff">
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/static/service-worker.js")
+        .then(reg => console.log("Service Worker registered:", reg.scope))
+        .catch(err => console.error("Service Worker registration failed:", err));
+    });
+  }
+</script>
+
+</head>
+<body>
+    <!-- Navbar -->
+    <nav style="background-color:#1f1f1f; padding:10px 20px; display:flex; justify-content:space-between; align-items:center;">
+        <a href="{{ url_for('index') }}" style="color:#e0e0e0; font-weight:bold; font-size:18px; text-decoration:none;">Earthquake Alert Prediction</a>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary" style="margin-right:10px;">Input</a>
+            <a href="{{ url_for('show_history') }}" class="btn btn-secondary">History & Charts</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align:center; padding:10px; margin-top:20px; color:#888; font-size:14px;">
+        &copy; 2025 Shreya Sambhaji Hadawale | Samarth Polytechnic, Belhe
+    </footer>
+</body>
+</html>

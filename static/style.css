@@ -1,0 +1,116 @@
+/* General body & dark background */
+body {
+    background-color: #1e1e2f;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* Card style */
+.card {
+    background-color: #2a2a3f;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+}
+
+/* Form fields */
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #1f1f2d;
+    color: #fff;
+}
+
+label {
+    font-weight: bold;
+    margin-top: 10px;
+    display: block;
+}
+
+/* Buttons */
+.btn {
+    background-color: #ff5722;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: #e64a19;
+}
+
+/* Map container */
+#map, #result-map, #history-map {
+    height: 300px;
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table th, table td {
+    border: 1px solid #444;
+    padding: 8px;
+    text-align: center;
+}
+
+table th {
+    background-color: #33334d;
+}
+
+/* Alert banner */
+.alert-banner {
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.alert-Green { background-color: #4caf50; }
+.alert-Yellow { background-color: #ffeb3b; color: #000; }
+.alert-Orange { background-color: #ff9800; }
+.alert-Red { background-color: #f44336; }
+
+/* Chart containers */
+.chart-container {
+    background-color: #2a2a3f;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+/* Compact charts */
+canvas {
+    max-width: 100% !important;
+    max-height: 200px !important;
+}
+
+
