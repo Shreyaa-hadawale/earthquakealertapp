@@ -1,14 +1,12 @@
-<<<<<<< HEAD
-=======
+
 import os
 from waitress import serve # type: ignore
->>>>>>> 267b126dc953be5ed1c4aaa5d1097ec59cd97069
+
 from flask import Flask, render_template, request
 from datetime import datetime
 
 app = Flask(__name__)
 
-<<<<<<< HEAD
 # Store history in memory
 history = []
 
@@ -113,7 +111,6 @@ if __name__ == "__main__":
 
 
 
-=======
 # Locations (can replace with real encoding)
 locations = ['Region A','Region B','Region C','Region D']
 
@@ -230,4 +227,3 @@ def index():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     serve(app, host="0.0.0.0", port=port)
->>>>>>> 267b126dc953be5ed1c4aaa5d1097ec59cd97069
