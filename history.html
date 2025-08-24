@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="padding:20px; color:white; font-family:Arial, sans-serif;">
+
+    <h1 style="text-align:center; margin-bottom:30px;">Earthquake Alert History</h1>
+
+    <!-- History Table Card -->
+    <div class="card" style="background:#1E1E2F; margin-bottom:30px;">
+        <div class="card-body">
+            <h2>Recent Alerts</h2>
+            <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; color:white;">
+                    <thead>
+                        <tr>
+                            <th style="padding:10px; border-bottom:1px solid #555;">Timestamp</th>
+                            <th style="padding:10px; border-bottom:1px solid #555;">Alert</th>
+                            <th style="padding:10px; border-bottom:1px solid #555;">Latitude</th>
+                            <th style="padding:10px; border-bottom:1px solid #555;">Longitude</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for h in history %}
+                        <tr>
+                            <td style="padding:8px; border-bottom:1px solid #555;">{{ h.timestamp }}</td>
+                            <td style="padding:8px; border-bottom:1px solid #555; font-weight:bold; color:{% if h.alert=='Red' %}#FF4C4C{% elif h.alert=='Orange' %}#FF9900{% elif h.alert=='Yellow' %}#FFFF66{% else %}#66FF66{% endif %};">
+                                {{ h.alert }}
+                            </td>
+                            <td style="padding:8px; border-bottom:1px solid #555;">{{ h.latitude }}</td>
+                            <td style="padding:8px; border-bottom:1px solid #555;">{{ h.longitude }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Card -->
+    <div class="card" style="background:#1E1E2F; margin-bottom:30px;">
+        <div class="card-body">
+            <h2>Alert Locations Map</h2>
+            <div id="historyMap" style="height:400px; border-radius:10px;"></div>
+        </div>
+    </div>
+
+    <!-- Heatmap & Trends Card -->
+    <div style="display:flex; flex-wrap:wrap; gap:20px;">
+
+        <!-- Alert Frequency Heatmap -->
+        <div style="flex:1 1 400px;" class="card" style="background:#1E1E2F;">
+            <div class="card-body">
+                <h3>Alert Frequency Heatmap</h3>
+                <canvas id="heatmapChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Mini Sparkline Trends -->
+        <div style="flex:1 1 400px;" class="card" style="background:#1E1E2F;">
+            <div class="card-body">
+                <h3>Recent Alert Trends</h3>
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Leaflet & MarkerCluster -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+
+<script>
+var map = L.map('historyMap').setView([0,0], 2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+
+var markers = L.markerClusterGroup();
+{% for h in history %}
+    var circle = L.circleMarker([{{ h.latitude }}, {{ h.longitude }}], {
+        color: '{{ h.alert|lower }}'=='red' ? '#FF4C4C' : '{{ h.alert|lower }}'=='orange' ? '#FF9900' : '{{ h.alert|lower }}'=='yellow' ? '#FFFF66' : '#66FF66',
+        radius: 8,
+        fillOpacity: 0.8
+    }).bindPopup("<b>{{ h.alert }}</b><br>{{ h.timestamp }}").on('mouseover', function(e){ this.openPopup(); }).on('mouseout', function(e){ this.closePopup(); });
+    markers.addLayer(circle);
+{% endfor %}
+map.addLayer(markers);
+</script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Heatmap chart
+    var heatCtx = document.getElementById('heatmapChart').getContext('2d');
+    var labels = [{% for h in history %}'{{ h.timestamp }}',{% endfor %}];
+    var data = [{% for h in history %}{% if h.alert=='Red' %}3{% elif h.alert=='Orange' %}2{% elif h.alert=='Yellow' %}1{% else %}0{% endif %},{% endfor %}];
+
+    new Chart(heatCtx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Alert Level',
+                data: data,
+                backgroundColor: data.map(v=>v==3?'#FF4C4C':v==2?'#FF9900':v==1?'#FFFF66':'#66FF66')
+            }]
+        },
+        options: {
+            responsive:true,
+            plugins:{
+                legend:{labels:{color:'white'}},
+                tooltip:{enabled:true}
+            },
+            scales:{
+                y:{beginAtZero:true,max:3,ticks:{color:'white'},title:{display:true,text:'Alert Level',color:'white'}},
+                x:{ticks:{color:'white'}}
+            }
+        }
+    });
+
+    // Sparkline trends
+    var trendCtx = document.getElementById('trendChart').getContext('2d');
+    var counts = {Green:0,Yellow:0,Orange:0,Red:0};
+    {% for h in history %} counts['{{ h.alert }}'] +=1; {% endfor %}
+    new Chart(trendCtx, {
+        type:'bar',
+        data:{
+            labels:['Green','Yellow','Orange','Red'],
+            datasets:[{
+                label:'Total Alerts',
+                data:[counts['Green'],counts['Yellow'],counts['Orange'],counts['Red']],
+                backgroundColor:['#66FF66','#FFFF66','#FF9900','#FF4C4C']
+            }]
+        },
+        options:{
+            responsive:true,
+            plugins:{legend:{display:false}, tooltip:{enabled:true}},
+            scales:{
+                y:{beginAtZero:true,ticks:{color:'white'}},
+                x:{ticks:{color:'white'}}
+            }
+        }
+    });
+</script>
+{% endblock %}
+
+
+
+
+
+
